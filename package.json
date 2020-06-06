@@ -1,6 +1,6 @@
 {
   "name": "vk-bot-sdk",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A simple bot SDK for vk.com",
   "main": "index.js",
   "scripts": {

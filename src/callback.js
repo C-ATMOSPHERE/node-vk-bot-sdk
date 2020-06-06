@@ -11,7 +11,11 @@ class VkBotSdkCallback {
      */
     constructor(client) {
         this.client = client;
-        this.tasks = [];
+
+        this.middlewaresHandlers = [];
+        this.eventsHandlers = [];
+        this.messagesHandlers = [];
+        this.errorsHandlers = [];
 
         this.longpoll = {
             key: '',
@@ -24,79 +28,64 @@ class VkBotSdkCallback {
 
     /**
      * Добавляет middleware для всех событий
-     *
-     * @param {function(Context, NextFunction)} arguments[0] - Callback function
+     * @param {function} cb - Callback function
      */
-    use() {
-        const args = Array.from(arguments);
+    use(cb) {
+        this.middlewaresHandlers.push({ cb: cb });
+    }
 
-        this.tasks.push({
-            type: 'middleware',
-            cb: args[0]
-        });
+    /**
+     * Добавляет обработчик ошибок для всех Callback функций
+     * @param {function} cb - Error callback function
+     */
+    onError(cb) {
+        this.errorsHandlers.push({ cb: cb });
     }
 
     /**
      * Добавляет обработчик события
      *
-     * @param {string} arguments[0] - Callback event (https://vk.com/dev/groups_events)
-     * @param {function(Context, NextFunction)} arguments[1] - Callback function
+     * @param {string} e - Callback event (https://vk.com/dev/groups_events)
+     * @param {function} cb - Callback function
      */
-    on() {
-        const args = Array.from(arguments);
-
-        this.tasks.push({
-            type: 'event',
-            event: args[0],
-            cb: args[1]
-        });
+    on(e, cb) {
+        this.eventsHandlers.push({ event: e, cb: cb });
     }
 
     /**
      * Добавляет обработчик полезной нагрузки
      *
-     * @param {string|string[]} arguments[0] - Payload action
-     * @param {function(Context, Object: params)} arguments[1] - Callback function
+     * @param {string|string[]} act - Payload action
+     * @param {function} cb - Callback function with params
      */
-    payload() {
-        const args = Array.from(arguments);
-
-        this.tasks.push({
+    payload(act, cb) {
+        this.messagesHandlers.push({
             type: 'payload',
-            actions: Array.isArray(args[0]) ? args[0] : [args[0]],
-            cb: args[1]
+            actions: Array.isArray(act) ? act : [act],
+            cb: cb
         });
     }
 
     /**
      * Добавляет обработчик команды
      *
-     * @param {string|string[]|RegExp|RegExp[]} arguments[0] - Command keywords
-     * @param {function(Context, Object: data, NextFunction)} arguments[1] - Callback function
+     * @param {string|string[]|RegExp|RegExp[]} exp - Command keywords / RegExp
+     * @param {function} cb - Callback function with params
      */
-    command() {
-        const args = Array.from(arguments);
-
-        this.tasks.push({
+    command(exp, cb) {
+        this.messagesHandlers.push({
             type: 'command',
-            expressions: Array.isArray(args[0]) ? args[0] : [args[0]],
-            cb: args[1]
+            expressions: Array.isArray(exp) ? exp : [exp],
+            cb: cb
         });
     }
 
     /**
      * Добавляет стандартный обработчик команды
-     *
-     * @param {function(Context, Object: data, NextFunction)} arguments[0] - Callback function
+     * @param {function} cb - Callback function with params
      */
-    defaultCommand() {
-        const args = Array.from(arguments);
-
-        this.tasks.push({
-            type: 'command',
-            expressions: [],
-            cb: args[0]
-        });
+    defaultCommand(cb) {
+        this.messagesHandlers.push({ type: 'command',  expressions: [],  cb: cb });
     }
 
     /**
@@ -109,17 +98,15 @@ class VkBotSdkCallback {
             throw new NotImplementedError('options.group_id is required for longpoll');
         }
 
-        setTimeout(async () => {
-            const data = await this.request('groups.getLongPollServer', {
-                group_id: options.group_id
-            });
-
+        this.request('groups.getLongPollServer', {
+            group_id: options.group_id
+        }).then(async (data) => {
             this.longpoll.key = data.key;
             this.longpoll.server = data.server;
             this.longpoll.ts = data.ts;
 
-            this.requestLongPoll().then();
-        }, 0);
+            await this.requestLongPoll();
+        });
     }
 
     /**
@@ -182,35 +169,66 @@ class VkBotSdkCallback {
      * @param {Object} data
      */
     async handleEvent(data) {
-        const tasks = [...this.tasks];
+        const middlewaresHandlers = [...this.middlewaresHandlers];
+        const eventsHandlers = [...this.eventsHandlers];
+        const messagesHandlers = [...this.messagesHandlers];
+        const errorsHandlers = [...this.errorsHandlers];
+
         const ctx = new Context(this.client, data);
 
-        const handleCallback = async (task, params = null) => {
-            const result = params ? task.cb(ctx, params, handleNextTask) : task.cb(ctx, handleNextTask);
+        const handleCallback = async (task, parameter = null) => {
+            let cbParams = [];
 
-            if(result instanceof Promise) return await result;
-            else return result;
+            if(parameter instanceof Error) cbParams = [parameter, ctx, handleNextTask];
+            else if(parameter !== null) cbParams = [ctx, parameter, handleNextTask];
+            else cbParams = [ctx, handleNextTask];
+
+            try {
+                const result = task.cb(...cbParams);
+
+                if(result instanceof Promise) return await result;
+                else return result;
+            }
+            catch (e) {
+                handleNextTask(e, ctx, handleNextTask);
+            }
+
+            return null;
         };
-        const handleNextTask = () => {
-            if(tasks.length > 0) {
-                const task = tasks.splice(0, 1)[0];
+        const handleNextTask = (err = null) => {
+            if(err instanceof Error) {
+                console.log('next with error');
 
-                if(task.type === 'middleware') {
-                    return handleCallback(task);
+                if(errorsHandlers.length > 0) {
+                    const handler = errorsHandlers.splice(0, 1)[0];
+                    return handleCallback(handler, err);
                 }
-                else if(task.type === 'event') {
-                    if(task.event === data.type) return handleCallback(task);
+            }
+            else {
+                if(middlewaresHandlers.length > 0) {
+                    const middleware = middlewaresHandlers.splice(0, 1)[0];
+                    return handleCallback(middleware);
                 }
-                else if(task.type === 'payload') {
-                    const result = this._checkCommandPayloads(ctx, task);
-                    if (result !== false) return handleCallback(task, result);
-                }
-                else if (task.type === 'command') {
-                    const result = this._checkCommandExpressions(ctx, task);
-                    if (result !== false) return handleCallback(task, result);
-                }
+                else if(eventsHandlers.length > 0) {
+                    const event = eventsHandlers.splice(0, 1)[0];
+                    if(event.event === data.type) return handleCallback(event);
 
-                return handleNextTask();
+                    return handleNextTask();
+                }
+                else if(messagesHandlers.length > 0) {
+                    const handler = messagesHandlers.splice(0, 1)[0];
+
+                    if(handler.type === 'payload') {
+                        const result = this._checkCommandPayloads(ctx, handler);
+                        if (result !== false) return handleCallback(handler, result);
+                    }
+                    else if (handler.type === 'command') {
+                        const result = this._checkCommandExpressions(ctx, handler);
+                        if (result !== false) return handleCallback(handler, result);
+                    }
+
+                    return handleNextTask();
+                }
             }
         };
 

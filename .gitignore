@@ -1,0 +1,12 @@
+.idea/
+node_modules/
+package-lock.json
+yarn.json
+test.js
+
+# Dependency directories
+node_modules/
+jspm_packages/
+
+# Optional npm cache directory
+.npm

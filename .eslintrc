@@ -1,0 +1,22 @@
+{
+    "env": {
+        "node": true,
+        "es6": true
+    },
+    "globals": {
+        "_": "writable",
+        "app": "writable",
+        "db": "writable",
+        "mysql": "writable",
+        "modules": "writable"
+    },
+    "parserOptions": {
+        "ecmaVersion": 2018
+    },
+    "rules": {
+        "no-unused-vars": "off",
+        "no-empty": "off",
+        "no-constant-condition": "off"
+    },
+    "extends": "eslint:recommended"
+}

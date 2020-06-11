@@ -21,7 +21,7 @@ const main = async () => {
 
     app.use(bot.eventsCallback);
 
-    app.listen(10000);
+    app.listen(8000);
 };
 
 main().then(() => {

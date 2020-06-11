@@ -1,5 +1,5 @@
 {
-  "name": "vk-bot-sdk",
+  "name": "node-vk-bot-sdk",
   "version": "1.0.2",
   "description": "A simple bot SDK for vk.com",
   "main": "index.js",
@@ -23,7 +23,7 @@
   "bugs": {
     "url": "https://github.com/m-vts/node-vk-bot-sdk/issues"
   },
-  "homepage": "https://github.com/m-vts/node-vk-bot-sdk#readme",
+  "homepage": "https://github.com/m-vts/node-vk-bot-sdk",
   "dependencies": {
     "axios": "^0.19.2",
     "express": "^4.17.1",

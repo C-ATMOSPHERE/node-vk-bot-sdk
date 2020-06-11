@@ -14,8 +14,8 @@ const main = async () => {
         next();
     });
 
-    bot.defaultCommand((ctx, params) => {
-        ctx.replyKeyboard(`Default command\nCurrent date: ${ctx.date}`);
+    bot.defaultReply((ctx, params) => {
+        ctx.replyKeyboard(`Default reply\nCurrent date: ${ctx.date}`);
     });
 
     bot.initLongPoll();

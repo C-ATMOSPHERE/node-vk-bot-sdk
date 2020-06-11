@@ -1,14 +1,17 @@
+const events = require('./config/events');
+
 const VkBotSdkApi = require('./api');
 const VkBotSdkClient = require('./client');
 const VkBotSdkCallback = require('./callback');
-
-const events = require('./config/events');
 
 const {
     Context, Keyboard, Attachment,
     Button, TextButton, LinkButton, LocationButton, VKPayButton, VKAppButton
 } = require('./interfaces');
 
+const {
+    redisStorage
+} = require('./middlewares');
 
 /**
  * @typedef {{
@@ -35,12 +38,18 @@ const {
  *     'wall' | 'wall_reply' | 'sticker' | 'gift'
  * )} AttachmentType
  *
+ * @typedef {Function<Context, NextFunction>}          CtxCallback
+ * @typedef {Function<Error, Context, NextFunction>}   CtxErrorCallback
+ * @typedef {Function<Context, Object, NextFunction>}  CtxParamsCallback
+ *
  * @typedef {Function}                                  NextFunction
  * @typedef {number|string|number[]|string[]}           PeerParameter
  * @typedef {string}                                    TextParameter
  * @typedef {string|string[]|Attachment|Attachment[]}   AttachmentParameter
  * @typedef {Keyboard}                                  KeyboardParameter
  */
+
+
 
 /**
  * CLass VkBotSdk
@@ -81,10 +90,11 @@ class VkBotSdk {
     }
 }
 
+// Sdk exporting
 module.exports = VkBotSdk;
-
 module.exports.VkBotSdk = VkBotSdk;
 
+// Interfaces exporting
 module.exports.events = events;
 module.exports.context = Context;
 module.exports.keyboard = Keyboard;
@@ -96,7 +106,7 @@ module.exports.locationButton = LocationButton;
 module.exports.vkpayButton = VKPayButton;
 module.exports.vkappButton = VKAppButton;
 
-
+// Interfaces exporting
 module.exports.Events = events;
 module.exports.Context = Context;
 module.exports.Keyboard = Keyboard;
@@ -107,3 +117,6 @@ module.exports.LinkButton = LinkButton;
 module.exports.LocationButton = LocationButton;
 module.exports.VKPayButton = VKPayButton;
 module.exports.VKAppButton = VKAppButton;
+
+// Middlewares exporting
+module.exports.redisStorage = redisStorage;

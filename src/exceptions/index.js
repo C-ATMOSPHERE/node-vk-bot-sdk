@@ -7,34 +7,17 @@ class ApiError extends Error {
     }
 }
 
-class TypeError extends Error {
-    constructor(message) {
-        super(message);
-    }
-}
-
-class UploadError extends Error {
-    constructor(message) {
-        super(message);
-    }
-}
-
-class ValidateError extends Error {
-    constructor(message) {
-        super(message);
-    }
-}
-
-class NotImplementedError extends Error {
-    constructor(message) {
-        super(message);
-    }
-}
+class TypeError extends Error { }
+class UploadError extends Error { }
+class ValidateError extends Error { }
+class MiddlewareError extends Error { }
+class NotImplementedError extends Error { }
 
 module.exports = {
     ApiError,
     TypeError,
     UploadError,
     ValidateError,
+    MiddlewareError,
     NotImplementedError
 };

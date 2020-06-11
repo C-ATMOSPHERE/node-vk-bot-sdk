@@ -1,4 +1,4 @@
-const { VkBotSdk, Keyboard, TextButton, LinkButton, events: e } = require('../index');
+const { VkBotSdk, Keyboard, TextButton, LinkButton } = require('../index');
 
 const keyboard = new Keyboard([
     [ new TextButton('test', 'primary', ['payload_action', ['arg1']]) ],
@@ -19,15 +19,15 @@ const main = async () => {
         ctx.reply('payload_action');
     });
 
-    bot.command(/тест/, (ctx, params, next) => {
+    bot.command(/test/, (ctx, params, next) => {
         const user_id = ctx.from_id;
         const peer_id = ctx.peer_id;
 
         ctx.replyKeyboard(`reply to ${user_id} in ${peer_id}`, keyboard);
     });
 
-    bot.defaultCommand((ctx, params) => {
-        ctx.replyKeyboard(`Default command`, keyboard);
+    bot.defaultReply((ctx, params) => {
+        ctx.replyKeyboard(`Default reply`, keyboard);
     });
 
     bot.initLongPoll();

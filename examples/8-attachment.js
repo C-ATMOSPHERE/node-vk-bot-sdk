@@ -11,7 +11,7 @@ new Attachment('wall', -29060604, 448799, 'hash');
 new Attachment('wall-29060604_448799');
 
 /**
- * Инициализация из объекта API
+ * Инициализация из объекта API, полученного в событии / запросе
  */
 new Attachment({
     type: 'photo',

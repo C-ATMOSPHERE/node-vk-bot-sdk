@@ -5,10 +5,7 @@
     },
     "globals": {
         "_": "writable",
-        "app": "writable",
-        "db": "writable",
-        "mysql": "writable",
-        "modules": "writable"
+        "__": "writable"
     },
     "parserOptions": {
         "ecmaVersion": 2018

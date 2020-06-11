@@ -23,12 +23,12 @@ const main = async () => {
     bot.onError(customErrorsHandler);
     bot.onError(unknownErrorsHandler);
 
-    bot.defaultCommand((ctx, params) => {
+    bot.defaultReply((ctx, params) => {
         if(!('nonExistParameter' in ctx)) {
             throw new CustomBotError('Invalid ctx');
         }
 
-        ctx.replyKeyboard(`Default command, which will never sent`);
+        ctx.replyKeyboard(`Default reply, which will never sent`);
     });
 
     bot.initLongPoll();

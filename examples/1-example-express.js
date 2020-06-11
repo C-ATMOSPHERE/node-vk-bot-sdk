@@ -15,8 +15,8 @@ const main = async () => {
 
     const bot = sdk.getCallback();
 
-    bot.defaultCommand((ctx, params, next) => {
-        ctx.reply('Default answer');
+    bot.defaultReply((ctx, params, next) => {
+        ctx.reply('Default reply');
     });
 
     app.use(bot.eventsCallback);

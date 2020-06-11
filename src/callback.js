@@ -28,7 +28,7 @@ class VkBotSdkCallback {
 
     /**
      * Добавляет middleware для всех событий
-     * @param {function} cb - Callback function
+     * @param {CtxCallback} cb - Callback function
      */
     use(cb) {
         this.middlewaresHandlers.push({ cb: cb });
@@ -36,7 +36,7 @@ class VkBotSdkCallback {
 
     /**
      * Добавляет обработчик ошибок для всех Callback функций
-     * @param {function} cb - Error callback function
+     * @param {CtxErrorCallback} cb - Error callback function
      */
     onError(cb) {
         this.errorsHandlers.push({ cb: cb });
@@ -46,7 +46,7 @@ class VkBotSdkCallback {
      * Добавляет обработчик события
      *
      * @param {string} e - Callback event (https://vk.com/dev/groups_events)
-     * @param {function} cb - Callback function
+     * @param {CtxCallback} cb - Callback function
      */
     on(e, cb) {
         this.eventsHandlers.push({ event: e, cb: cb });
@@ -56,7 +56,7 @@ class VkBotSdkCallback {
      * Добавляет обработчик полезной нагрузки
      *
      * @param {string|string[]} act - Payload action
-     * @param {function} cb - Callback function with params
+     * @param {CtxParamsCallback} cb - Callback function with params
      */
     payload(act, cb) {
         this.messagesHandlers.push({
@@ -70,7 +70,7 @@ class VkBotSdkCallback {
      * Добавляет обработчик команды
      *
      * @param {string|string[]|RegExp|RegExp[]} exp - Command keywords / RegExp
-     * @param {function} cb - Callback function with params
+     * @param {CtxParamsCallback} cb - Callback function with params
      */
     command(exp, cb) {
         this.messagesHandlers.push({
@@ -82,10 +82,10 @@ class VkBotSdkCallback {
 
     /**
      * Добавляет стандартный обработчик команды
-     * @param {function} cb - Callback function with params
+     * @param {CtxParamsCallback} cb - Callback function with params
      */
-    defaultCommand(cb) {
-        this.messagesHandlers.push({ type: 'command',  expressions: [],  cb: cb });
+    defaultReply(cb) {
+        this.messagesHandlers.push({ type: 'command', expressions: [],  cb: cb });
     }
 
     /**
@@ -177,14 +177,12 @@ class VkBotSdkCallback {
         const ctx = new Context(this.client, data);
 
         const handleCallback = async (task, parameter = null) => {
-            let cbParams = [];
-
-            if(parameter instanceof Error) cbParams = [parameter, ctx, handleNextTask];
-            else if(parameter !== null) cbParams = [ctx, parameter, handleNextTask];
-            else cbParams = [ctx, handleNextTask];
-
             try {
-                const result = task.cb(...cbParams);
+                let result;
+
+                if(parameter instanceof Error) result = task.cb(parameter, ctx, handleNextTask);
+                else if(parameter !== null) result = task.cb(ctx, parameter, handleNextTask);
+                else result = task.cb(ctx, handleNextTask);
 
                 if(result instanceof Promise) return await result;
                 else return result;
@@ -197,8 +195,6 @@ class VkBotSdkCallback {
         };
         const handleNextTask = (err = null) => {
             if(err instanceof Error) {
-                console.log('next with error');
-
                 if(errorsHandlers.length > 0) {
                     const handler = errorsHandlers.splice(0, 1)[0];
                     return handleCallback(handler, err);
@@ -247,7 +243,6 @@ class VkBotSdkCallback {
         if(ctx.payload.length === 0) return false;
 
         for (let action of task.actions) {
-            console.log('check', ctx.payload[0], action);
             if(ctx.payload[0] === action) return ctx.payload[1];
         }
 

@@ -41,7 +41,9 @@ bot.defaultReply((ctx, params) => {
     ctx.reply('Default reply');
 });
 
-app.use(bot.eventsCallback);
+app.use(express.json());
+app.all('/callback', bot.eventsCallback);
+
 app.listen(8080);
 ```
 

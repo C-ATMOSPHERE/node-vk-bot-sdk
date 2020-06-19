@@ -2,6 +2,9 @@ const { VkBotSdk, Keyboard, TextButton } = require('../index');
 
 const mainKeyboard = new Keyboard([
     [
+        new TextButton('Button 1', 'primary', 'payload_action')
+    ],
+    [
         new TextButton('Button 1', 'primary', ['payload_action', ['arg1']])
     ],
     [
@@ -21,7 +24,7 @@ const main = async () => {
     bot.payload('payload_action', (ctx, params, next) => {
         const arg = params[0] || '';
 
-        ctx.reply(`payload_action\n arg[0]: ${arg}`);
+        ctx.reply(`payload_action\n args[0]: ${arg}`);
     });
 
     bot.defaultReply((ctx, params) => {

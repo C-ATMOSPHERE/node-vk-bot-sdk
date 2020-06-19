@@ -16,7 +16,7 @@ class LinkButton extends Button {
                 type: 'open_link',
                 link: link,
                 label: label,
-                payload: this.payload(payload)
+                payload: this.encodePayload(payload)
             }
         };
     }

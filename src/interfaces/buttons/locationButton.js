@@ -12,7 +12,7 @@ class LocationButton extends Button {
         this.button = {
             action: {
                 type: 'location',
-                payload: this.payload(payload)
+                payload: this.encodePayload(payload)
             }
         };
     }

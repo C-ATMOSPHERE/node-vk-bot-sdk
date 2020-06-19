@@ -43,7 +43,7 @@ class VkBotSdkClient {
 
         this.client = axios.create({
             baseURL: 'https://api.vk.com/method/'
-        }); 
+        });
     }
 
     /**
@@ -71,6 +71,7 @@ class VkBotSdkClient {
     /**
      * Отправляет запрос к API
      *
+     * @throws ApiError
      * @param {string} method
      * @param {object} params
      */
@@ -138,11 +139,11 @@ class VkBotSdkClient {
      * Отправляет сообщение с указанными данными
      *
      * @async
-     * @param {PeerParameter} arguments[0]           - Получатель/получатели сообщения
-     * @param {TextParameter} arguments[1]           - Текст сообщения
-     * @param {AttachmentParameter} arguments[2]     - Вложение/вложения
-     * @param {KeyboardParameter} arguments[3]       - Клавиатура
-     * @param {Object} arguments[4]                  - Собственные параметры
+     * @param {number|string|number[]|string[]} arguments[0]            - Получатель/получатели сообщения
+     * @param {string} arguments[1]                                     - Текст сообщения
+     * @param {string|string[]|Attachment|Attachment[]} arguments[2]    - Вложение/вложения
+     * @param {Keyboard} arguments[3]                                   - Клавиатура
+     * @param {Object} arguments[4]                                     - Собственные параметры
      */
     sendMessage() {
         let args = Array.from(arguments);

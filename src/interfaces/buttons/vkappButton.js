@@ -16,7 +16,7 @@ class VKAppButton extends Button {
 
         const action = {
             type: 'open_app',
-            payload: this.payload(payload)
+            payload: this.encodePayload(payload)
         };
 
         if('app_id' in params) action.app_id = params.app_id;

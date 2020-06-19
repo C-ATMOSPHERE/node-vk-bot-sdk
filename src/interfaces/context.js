@@ -6,6 +6,7 @@
  * @property {number} group_id
  * @property {number} event_id
  *
+ * @property {number} user_id
  * @property {number} from_id
  * @property {number} peer_id
  * @property {number} message_id
@@ -36,6 +37,7 @@ class Context {
         this.group_id = params.group_id;
         this.event_id = params.event_id;
 
+        this.user_id = 0;
         this.from_id = 0;
         this.peer_id = 0;
         this.message_id = 0;
@@ -51,7 +53,7 @@ class Context {
             lang_id: 0
         };
 
-        const default_types = {
+        const defaultIdsProperties = {
             user_id: [
                 'photo_comment_delete', 'video_comment_delete', 'market_comment_delete',
                 'market_order_new', 'market_order_edit',
@@ -75,15 +77,18 @@ class Context {
             ]
         };
 
-        if(default_types.user_id.includes(event)) {
+        if(defaultIdsProperties.user_id.includes(event)) {
+            this.user_id = data['user_id'];
             this.from_id = data['user_id'];
             this.peer_id = data['user_id'];
         }
-        else if(default_types.owner_id.includes(event)) {
+        else if(defaultIdsProperties.owner_id.includes(event)) {
+            this.user_id = data['owner_id'];
             this.from_id = data['owner_id'];
             this.peer_id = data['owner_id'];
         }
-        else if(default_types.from_id.includes(event)) {
+        else if(defaultIdsProperties.from_id.includes(event)) {
+            this.user_id = data['from_id'];
             this.from_id = data['from_id'];
             this.peer_id = data['from_id'];
         }
@@ -93,6 +98,7 @@ class Context {
             if('message' in data) message = data.message;
             if('client_info' in data) this.client_info = data.client_info;
 
+            this.user_id = message['from_id'];
             this.from_id = message['from_id'];
             this.peer_id = message['peer_id'];
             this.message_id = message['id'];
@@ -103,28 +109,42 @@ class Context {
             if(message.payload) {
                 try {
                     const payload = JSON.parse(message.payload);
-                    this.payload = Array.from(payload);
+
+                    if(typeof payload === 'string') this.payload = [payload, []];
+                    else this.payload = Array.from(payload);
                 }
                 catch (e) { }
             }
         }
         else if(['message_allow', 'message_deny'].includes(event)) {
+            this.user_id = data.user_id;
             this.from_id = data.user_id;
             this.peer_id = data.user_id;
         }
         else if(['like_add', 'like_remove']) {
+            this.user_id = data['liker_id'];
             this.from_id = data['liker_id'];
             this.peer_id = data['liker_id'];
         }
     }
 
     /**
+     * Отправляет запрос к API
+     *
+     * @param {string} method
+     * @param {object} params
+     */
+    request(method, params) {
+        return this.client.request(method, params);
+    }
+
+    /**
      * Отправляет ответ с текстом, вложениями и клавиатурой
      *
      * @async
-     * @param {TextParameter} text
-     * @param {AttachmentParameter} attachment
-     * @param {KeyboardParameter} keyboard
+     * @param {string} text
+     * @param {string|string[]|Attachment|Attachment[]} attachment
+     * @param {Keyboard} keyboard
      */
     reply(text = '', attachment = null, keyboard = null) {
         return this.client.sendMessage(this.peer_id, text, attachment, keyboard);
@@ -134,8 +154,8 @@ class Context {
      * Отправляет ответ с текстом и клавиатурой
      *
      * @async
-     * @param {TextParameter} text
-     * @param {KeyboardParameter} keyboard
+     * @param {string} text
+     * @param {Keyboard} keyboard
      */
     replyKeyboard(text = '', keyboard = null) {
         return this.client.sendMessage(this.peer_id, text, null, keyboard);
@@ -145,7 +165,7 @@ class Context {
      * Отправляет ответ только с вложениями
      *
      * @async
-     * @param {AttachmentParameter} attachment
+     * @param {string|string[]|Attachment|Attachment[]} attachment
      */
     replyAttachment(attachment = null) {
         return this.client.sendMessage(this.peer_id, '', attachment);
@@ -163,14 +183,26 @@ class Context {
         return this.client.sendMessage(params);
     }
 
+    /**
+     * Возвращает информацию о поддержке клавиатуры из "client_info"
+     * @returns {boolean}
+     */
     isKeyboardSupported() {
         return !!(this.client_info.keyboard);
     }
 
+    /**
+     * Возвращает информацию о поддержке инлайн-клавиатуры из "client_info"
+     * @returns {boolean}
+     */
     isInlineKeyboardSupported() {
         return !!(this.client_info.inline_keyboard);
     }
 
+    /**
+     * Возвращает информацию о поддержке каруселей из "client_info"
+     * @returns {boolean}
+     */
     isCarouselSupported() {
         return !!(this.client_info.carousel);
     }

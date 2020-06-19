@@ -14,7 +14,7 @@ class Button {
         return this.button;
     }
 
-    payload(data) {
+    encodePayload(data) {
         return JSON.stringify(data);
     }
 }

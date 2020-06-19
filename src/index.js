@@ -38,17 +38,10 @@ const {
  *     'wall' | 'wall_reply' | 'sticker' | 'gift'
  * )} AttachmentType
  *
- * @typedef {Function<Context, NextFunction>}          CtxCallback
- * @typedef {Function<Error, Context, NextFunction>}   CtxErrorCallback
- * @typedef {Function<Context, Object, NextFunction>}  CtxParamsCallback
- *
- * @typedef {Function}                                  NextFunction
- * @typedef {number|string|number[]|string[]}           PeerParameter
- * @typedef {string}                                    TextParameter
- * @typedef {string|string[]|Attachment|Attachment[]}   AttachmentParameter
- * @typedef {Keyboard}                                  KeyboardParameter
+ * @typedef {Function<Context, Function>}          CtxCallback
+ * @typedef {Function<Error, Context, Function>}   CtxErrorCallback
+ * @typedef {Function<Context, Object, Function>}  CtxParamsCallback
  */
-
 
 
 /**

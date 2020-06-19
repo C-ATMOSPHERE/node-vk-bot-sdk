@@ -17,7 +17,7 @@ class VKPayButton extends Button {
             action: {
                 type: 'vkpay',
                 hash: hash,
-                payload: this.payload(payload)
+                payload: this.encodePayload(payload)
             }
         };
     }

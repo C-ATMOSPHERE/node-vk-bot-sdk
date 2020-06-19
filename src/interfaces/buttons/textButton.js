@@ -6,7 +6,7 @@ class TextButton extends Button {
      *
      * @param {string} label
      * @param {ButtonColor} color
-     * @param {Array} payload
+     * @param {Array|string} payload
      */
     constructor(label, color = 'default', payload = []) {
         super();
@@ -15,7 +15,7 @@ class TextButton extends Button {
             action: {
                 type: 'text',
                 label: label,
-                payload: this.payload(payload),
+                payload: this.encodePayload(payload),
             },
             color: color
         };

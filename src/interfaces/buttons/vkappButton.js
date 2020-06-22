@@ -16,6 +16,7 @@ class VKAppButton extends Button {
 
         const action = {
             type: 'open_app',
+            label: label,
             payload: this.encodePayload(payload)
         };
 

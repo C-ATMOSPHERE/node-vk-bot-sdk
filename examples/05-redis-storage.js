@@ -18,7 +18,7 @@ const main = async () => {
         }
     }));
 
-    bot.command(/test/, async (ctx, params, next) => {
+    bot.command(/index/, async (ctx, params, next) => {
         await ctx.storage.set('active_poll', true);
         await ctx.storage.expire('active_poll', 60 * 60);
 

@@ -25,8 +25,8 @@ const main = async () => {
     });
 
 
-    bot.command(/test/, (ctx, params, next) => {
-        ctx.reply('test');
+    bot.command(/index/, (ctx, params, next) => {
+        ctx.reply('index');
     });
 
     bot.defaultReply((ctx, params) => {

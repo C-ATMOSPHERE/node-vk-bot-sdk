@@ -1,7 +1,7 @@
 const { VkBotSdk, Keyboard, TextButton, LinkButton } = require('../index');
 
 const keyboard = new Keyboard([
-    [ new TextButton('test', 'primary', ['payload_action', ['arg1']]) ],
+    [ new TextButton('index', 'primary', ['payload_action', ['arg1']]) ],
     [ new LinkButton('link', 'https://google.com') ]
 ]);
 
@@ -19,7 +19,7 @@ const main = async () => {
         ctx.reply('payload_action');
     });
 
-    bot.command(/test/, (ctx, params, next) => {
+    bot.command(/index/, (ctx, params, next) => {
         const user_id = ctx.from_id;
         const peer_id = ctx.peer_id;
 

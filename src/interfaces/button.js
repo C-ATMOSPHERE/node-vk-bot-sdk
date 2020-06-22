@@ -1,3 +1,5 @@
+const { TypeError } = require('../exceptions');
+
 /**
  * Class Button
  *
@@ -7,6 +9,10 @@
  */
 class Button {
     constructor() {
+        if(!new.target || new.target.name === 'Button') {
+            throw new TypeError('Use typed buttons instead of default Button');
+        }
+
         this.button = {};
     }
 

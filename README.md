@@ -2,7 +2,12 @@
 
 Небольшое SDK для создания чат-ботов с использованием Node.JS на платформе [сообществ ВКонтакте](https://vk.com/dev/bots_docs).
 
-Рекомендуется использовать с версиями API выше [5.103](https://vk.com/dev/versions).
+Рекомендуется использовать с версиями VK API выше [5.103](https://vk.com/dev/versions).
+
+[![npm version](https://img.shields.io/npm/v/node-vk-bot-sdk)](https://www.npmjs.org/package/node-vk-bot-sdk)
+[![install size](https://packagephobia.now.sh/badge?p=node-vk-bot-sdk)](https://packagephobia.now.sh/result?p=node-vk-bot-sdk)
+[![npm downloads](https://img.shields.io/npm/dm/node-vk-bot-sdk.svg)](http://npm-stat.com/charts.html?package=node-vk-bot-sdk)
+![license: MIT](https://img.shields.io/badge/License-MIT-blue.svg)
 
 ## Установка
 ```bash
